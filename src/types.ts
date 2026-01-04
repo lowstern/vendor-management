@@ -10,6 +10,20 @@ export interface Consultant {
   deliverables: string[];
   results: string[];
   status: 'active' | 'completed' | 'pending';
+  // Outcome as a Service fields
+  overallOutputSummary?: string;
+  decisionMaker?: string;
+  decisionMakerEmail?: string;
+  outcomeMetrics?: OutcomeMetric[];
+}
+
+export interface OutcomeMetric {
+  id: string;
+  metricName: string;
+  targetValue: string;
+  currentValue?: string;
+  status: 'on-track' | 'at-risk' | 'completed' | 'not-started';
+  lastUpdated?: string;
 }
 
 export interface SaaSProduct {
@@ -135,5 +149,45 @@ export interface AuthContextType {
   requestDuoAuth: () => Promise<string | null>;
 }
 
+export interface OutcomeService {
+  id: string;
+  consultantId: string;
+  companyId: string;
+  serviceName: string;
+  description: string;
+  overallOutputSummary: string;
+  decisionMaker: string;
+  decisionMakerEmail: string;
+  outcomeMetrics: OutcomeMetric[];
+  status: 'active' | 'completed' | 'paused';
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface OrgMember {
+  id: string;
+  name: string;
+  title: string;
+  role: 'coo' | 'vp' | 'director' | 'manager' | 'operator';
+  budget: number;
+  parentId?: string;
+  directReports?: OrgMember[];
+  vendorAllocations?: {
+    vendorId: string;
+    vendorName: string;
+    allocation: number;
+  }[];
+}
+
+export interface OrgBreakdown {
+  id: string;
+  firmId: string;
+  totalBudget: number;
+  fiscalYear: string;
+  members: OrgMember[];
+  createdAt: string;
+  updatedAt: string;
+}
+
 export type SwipeDirection = 'left' | 'right' | null;
-export type ViewMode = 'swipe' | 'consultant-detail' | 'saas-detail' | 'legal-detail' | 'contracts' | 'contract-upload' | 'login' | 'signup' | 'duo-verify' | 'vcp' | 'dashboard' | 'firm-setup' | 'vcp-submit' | 'firm-settings';
+export type ViewMode = 'swipe' | 'consultant-detail' | 'saas-detail' | 'legal-detail' | 'contracts' | 'contract-upload' | 'login' | 'signup' | 'duo-verify' | 'vcp' | 'dashboard' | 'firm-setup' | 'vcp-submit' | 'firm-settings' | 'outcome-service' | 'consultant-questions' | 'org-breakdown';

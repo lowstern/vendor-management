@@ -38,6 +38,27 @@ export const mockCompanies: Company[] = [
           'Increased customer satisfaction scores by 18%',
         ],
         status: 'active',
+        overallOutputSummary: 'Digital transformation initiative delivering automated workflows, modernized systems, and comprehensive staff training to reduce costs and improve operational efficiency.',
+        decisionMaker: 'Sarah Johnson, Chief Technology Officer',
+        decisionMakerEmail: 'sarah.johnson@techcorp.com',
+        outcomeMetrics: [
+          {
+            id: 'm1-1',
+            metricName: 'Cost Reduction',
+            targetValue: '25% reduction',
+            currentValue: '23% achieved',
+            status: 'on-track',
+            lastUpdated: '2024-05-15',
+          },
+          {
+            id: 'm1-2',
+            metricName: 'System Performance',
+            targetValue: '35% improvement',
+            currentValue: '40% improvement',
+            status: 'completed',
+            lastUpdated: '2024-05-20',
+          },
+        ],
       },
       {
         id: 'c1-2',

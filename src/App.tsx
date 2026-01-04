@@ -3,6 +3,7 @@ import { mockCompanies } from './data/mockCompanies';
 import { Company, ViewMode, Firm } from './types';
 import { useAuth } from './contexts/AuthContext';
 import SwipeableCard from './components/SwipeableCard';
+import CompanyCard from './components/CompanyCard';
 import ConsultantsListView from './components/ConsultantsListView';
 import SaaSListView from './components/SaaSListView';
 import LegalServicesListView from './components/LegalServicesListView';
@@ -15,6 +16,7 @@ import VCPPortal from './components/VCPPortal';
 import CompanyDashboard from './components/CompanyDashboard';
 import FirmSetup from './components/FirmSetup';
 import FirmSettings from './components/FirmSettings';
+import OrgBreakdownView from './components/OrgBreakdownView';
 
 function App() {
   const { isAuthenticated, user, firm, logout, needsDuoVerification } = useAuth();
@@ -27,6 +29,7 @@ function App() {
   }>({ accepted: [], rejected: [] });
   const [currentView, setCurrentView] = useState<ViewMode>('swipe');
   const [currentCompany, setCurrentCompany] = useState<Company | null>(null);
+  const [icView, setIcView] = useState(false); // Investment Committee View toggle
 
   const handleSwipe = (direction: 'left' | 'right') => {
     if (companies.length === 0) return;
@@ -218,97 +221,141 @@ function App() {
         {/* Header with User Info */}
         <div className="mb-8 text-center w-full max-w-4xl">
           <div className="flex justify-between items-center mb-4">
-            <div className="flex items-center gap-4">
-              <div className="bg-blue-100 rounded-full px-4 py-2">
-                <span className="text-sm font-semibold text-blue-800">
+            <div className="flex items-center gap-3">
+              <div className="bg-slate-100 border border-slate-300 rounded-institutional px-3 py-1.5">
+                <span className="text-xs font-medium text-slate-700">
                   {user?.name || 'User'}
                 </span>
               </div>
               {firm && (
-                <span className="text-xs text-gray-500">
+                <span className="text-xs text-slate-600">
                   {firm.name}
                 </span>
               )}
               {user && (
-                <span className="text-xs text-gray-500 capitalize">
+                <span className="text-xs text-slate-500 uppercase tracking-wide">
                   {user.role}
                 </span>
               )}
             </div>
-            <div className="flex items-center gap-4">
+            <div className="flex items-center gap-3">
+              {/* IC View Toggle */}
+              {currentView === 'swipe' && (
+                <button
+                  onClick={() => setIcView(!icView)}
+                  className={`px-3 py-1.5 rounded-institutional text-xs font-medium transition-colors border ${
+                    icView 
+                      ? 'bg-slate-900 text-white border-slate-900' 
+                      : 'bg-white text-slate-700 border-slate-300 hover:bg-slate-50'
+                  }`}
+                >
+                  {icView ? 'IC View' : 'Standard View'}
+                </button>
+              )}
+              
+              {/* Org Breakdown */}
+              <button
+                onClick={() => setCurrentView('org-breakdown')}
+                className="px-3 py-1.5 bg-slate-100 text-slate-700 border border-slate-300 rounded-institutional text-xs font-medium hover:bg-slate-200 transition-colors"
+              >
+                Org Breakdown
+              </button>
+              
               {firm && firm.vcpEnabled && (
                 <button
                   onClick={() => setCurrentView('vcp')}
-                  className="bg-green-600 text-white px-4 py-2 rounded-lg text-sm font-semibold hover:bg-green-700"
+                  className="px-3 py-1.5 bg-slate-100 text-slate-700 border border-slate-300 rounded-institutional text-xs font-medium hover:bg-slate-200 transition-colors"
                 >
                   VCP Portal
                 </button>
               )}
-              {currentCompany && (
-                <button
-                  onClick={() => setCurrentView('dashboard')}
-                  className="bg-purple-600 text-white px-4 py-2 rounded-lg text-sm font-semibold hover:bg-purple-700"
-                >
-                  Dashboard
-                </button>
-              )}
+              
               {user && user.role === 'admin' && (
                 <button
                   onClick={() => setCurrentView('firm-settings')}
-                  className="bg-gray-600 text-white px-4 py-2 rounded-lg text-sm font-semibold hover:bg-gray-700"
+                  className="px-3 py-1.5 bg-slate-100 text-slate-700 border border-slate-300 rounded-institutional text-xs font-medium hover:bg-slate-200 transition-colors"
                 >
                   ⚙️ Settings
                 </button>
               )}
+              
               <button
                 onClick={logout}
-                className="text-gray-600 hover:text-gray-800 text-sm font-semibold"
+                className="px-3 py-1.5 text-slate-600 hover:text-slate-900 text-xs font-medium"
               >
                 Logout
               </button>
             </div>
           </div>
-          <h1 className="text-5xl font-bold text-gray-800 mb-2">
-            Vendor Management
+          <h1 className="text-3xl font-semibold text-slate-900 mb-1">
+            Vendor Portfolio Management
           </h1>
-          <p className="text-gray-600 text-lg">
-            Swipe to manage vendor relationships
+          <p className="text-sm text-slate-600">
+            {icView ? 'Investment Committee Review' : 'Manage vendor exposure and relationships'}
           </p>
         </div>
 
       {/* Stats */}
-      <div className="mb-6 flex gap-6">
-        <div className="bg-white rounded-lg px-6 py-3 shadow-md">
-          <p className="text-sm text-gray-600">Remaining</p>
-          <p className="text-2xl font-bold text-gray-800">{companies.length}</p>
+      {!icView && (
+        <div className="mb-8 flex gap-4">
+          <div className="bg-white border border-slate-200 rounded-institutional px-4 py-3 shadow-sm">
+            <p className="text-xs text-slate-600 uppercase tracking-wide mb-1">Remaining</p>
+            <p className="text-xl font-semibold text-slate-900">{companies.length}</p>
+          </div>
+          <div className="bg-white border border-slate-200 rounded-institutional px-4 py-3 shadow-sm">
+            <p className="text-xs text-slate-600 uppercase tracking-wide mb-1">Accepted</p>
+            <p className="text-xl font-semibold text-slate-900">{swipedCompanies.accepted.length}</p>
+          </div>
+          <div className="bg-white border border-slate-200 rounded-institutional px-4 py-3 shadow-sm">
+            <p className="text-xs text-slate-600 uppercase tracking-wide mb-1">Rejected</p>
+            <p className="text-xl font-semibold text-slate-900">{swipedCompanies.rejected.length}</p>
+          </div>
         </div>
-        <div className="bg-green-50 rounded-lg px-6 py-3 shadow-md border-2 border-green-500">
-          <p className="text-sm text-gray-600">Accepted</p>
-          <p className="text-2xl font-bold text-green-700">{swipedCompanies.accepted.length}</p>
-        </div>
-        <div className="bg-red-50 rounded-lg px-6 py-3 shadow-md border-2 border-red-500">
-          <p className="text-sm text-gray-600">Rejected</p>
-          <p className="text-2xl font-bold text-red-700">{swipedCompanies.rejected.length}</p>
-        </div>
-      </div>
+      )}
 
-      {/* Card Stack */}
-      <div className="relative w-full max-w-md h-[600px] flex items-center justify-center mb-8">
-        {companies.length > 0 ? (
-          companies.map((company, index) => (
-            <SwipeableCard
-              key={company.id}
-              company={company}
-              onSwipe={handleSwipe}
-              index={index}
-              totalCards={companies.length}
-              onViewConsultants={() => handleViewConsultants(company)}
-              onViewSaaS={() => handleViewSaaS(company)}
-              onViewLegal={() => handleViewLegal(company)}
-              onViewContracts={() => handleViewContracts(company)}
-            />
-          ))
-        ) : (
+      {/* Card Stack or IC View List */}
+      {icView ? (
+        <div className="w-full max-w-4xl mb-8">
+          <div className="mb-4">
+            <h3 className="text-sm font-semibold text-slate-700 mb-2 uppercase tracking-wide">
+              Investment Committee Review
+            </h3>
+            <p className="text-xs text-slate-500">
+              Executive summary view: vendor, run-rate, risk flags, recommended action
+            </p>
+          </div>
+          <div className="space-y-0">
+            {companies.map((company) => (
+              <div key={company.id} className="mb-0">
+                <CompanyCard
+                  company={company}
+                  onViewConsultants={() => handleViewConsultants(company)}
+                  onViewSaaS={() => handleViewSaaS(company)}
+                  onViewLegal={() => handleViewLegal(company)}
+                  onViewContracts={() => handleViewContracts(company)}
+                  icView={true}
+                />
+              </div>
+            ))}
+          </div>
+        </div>
+      ) : (
+        <div className="relative w-full max-w-md h-[600px] flex items-center justify-center mb-8">
+          {companies.length > 0 ? (
+            companies.map((company, index) => (
+              <SwipeableCard
+                key={company.id}
+                company={company}
+                onSwipe={handleSwipe}
+                index={index}
+                totalCards={companies.length}
+                onViewConsultants={() => handleViewConsultants(company)}
+                onViewSaaS={() => handleViewSaaS(company)}
+                onViewLegal={() => handleViewLegal(company)}
+                onViewContracts={() => handleViewContracts(company)}
+              />
+            ))
+          ) : (
           <div className="text-center p-8 bg-white rounded-2xl shadow-xl">
             <h2 className="text-2xl font-bold text-gray-800 mb-4">
               All done! 🎉
