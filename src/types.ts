@@ -73,9 +73,26 @@ export interface VendorSpending {
   total: number;
 }
 
+export interface Fund {
+  id: string;
+  name: string;
+  firmId: string;
+  description?: string;
+  vintageYear?: number;
+  totalCommitment?: number;
+  status: 'active' | 'closed' | 'wind-down';
+  createdAt: string;
+  updatedAt: string;
+  // Roll-up metrics (calculated)
+  totalSpending?: number;
+  companyCount?: number;
+  vendorCount?: number;
+}
+
 export interface Company {
   id: string;
   name: string;
+  fundId?: string; // Link to fund
   industry: string;
   logo?: string;
   description: string;
@@ -85,6 +102,9 @@ export interface Company {
   consultants: Consultant[];
   saasProducts: SaaSProduct[];
   legalCases: LegalCase[];
+  // Roll-up metrics (calculated)
+  totalVendorSpending?: number;
+  vendorCount?: number;
 }
 
 export interface Firm {
@@ -190,4 +210,4 @@ export interface OrgBreakdown {
 }
 
 export type SwipeDirection = 'left' | 'right' | null;
-export type ViewMode = 'swipe' | 'consultant-detail' | 'saas-detail' | 'legal-detail' | 'contracts' | 'contract-upload' | 'login' | 'signup' | 'duo-verify' | 'vcp' | 'dashboard' | 'firm-setup' | 'vcp-submit' | 'firm-settings' | 'outcome-service' | 'consultant-questions' | 'org-breakdown';
+export type ViewMode = 'swipe' | 'consultant-detail' | 'saas-detail' | 'legal-detail' | 'contracts' | 'contract-upload' | 'login' | 'signup' | 'duo-verify' | 'vcp' | 'dashboard' | 'firm-setup' | 'vcp-submit' | 'firm-settings' | 'outcome-service' | 'consultant-questions' | 'org-breakdown' | 'funds' | 'fund-detail';

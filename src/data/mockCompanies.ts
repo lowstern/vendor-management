@@ -4,6 +4,7 @@ export const mockCompanies: Company[] = [
   {
     id: '1',
     name: 'TechCorp Inc.',
+    fundId: 'fund-1',
     industry: 'Technology',
     description: 'Leading enterprise software solutions provider',
     spending: {
@@ -201,6 +202,7 @@ export const mockCompanies: Company[] = [
   {
     id: '2',
     name: 'Global Finance Group',
+    fundId: 'fund-2',
     industry: 'Financial Services',
     description: 'International investment banking and asset management',
     spending: {
@@ -362,6 +364,7 @@ export const mockCompanies: Company[] = [
   {
     id: '3',
     name: 'MedHealth Systems',
+    fundId: 'fund-2',
     industry: 'Healthcare',
     description: 'Advanced medical technology and patient care solutions',
     spending: {
@@ -453,6 +456,7 @@ export const mockCompanies: Company[] = [
   {
     id: '4',
     name: 'RetailMax Corp',
+    fundId: 'fund-1',
     industry: 'Retail',
     description: 'Omnichannel retail solutions and e-commerce platform',
     spending: {
@@ -537,6 +541,7 @@ export const mockCompanies: Company[] = [
   {
     id: '5',
     name: 'EnergySolutions Ltd',
+    fundId: 'fund-1',
     industry: 'Energy',
     description: 'Renewable energy infrastructure and consulting',
     spending: {
@@ -633,6 +638,7 @@ export const mockCompanies: Company[] = [
   {
     id: '6',
     name: 'EduTech Innovations',
+    fundId: 'fund-2',
     industry: 'Education',
     description: 'Cutting-edge educational technology platforms',
     spending: {
@@ -679,6 +685,7 @@ export const mockCompanies: Company[] = [
   {
     id: '7',
     name: 'ManufacturingPro',
+    fundId: 'fund-1',
     industry: 'Manufacturing',
     description: 'Industrial automation and smart manufacturing solutions',
     spending: {
@@ -763,6 +770,7 @@ export const mockCompanies: Company[] = [
   {
     id: '8',
     name: 'MediaStream Global',
+    fundId: 'fund-2',
     industry: 'Media & Entertainment',
     description: 'Digital content creation and streaming services',
     spending: {

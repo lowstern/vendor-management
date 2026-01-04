@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { mockCompanies } from './data/mockCompanies';
-import { Company, ViewMode, Firm } from './types';
+import { mockFunds } from './data/mockFunds';
+import { Company, ViewMode, Firm, Fund } from './types';
 import { useAuth } from './contexts/AuthContext';
 import SwipeableCard from './components/SwipeableCard';
 import CompanyCard from './components/CompanyCard';
@@ -17,6 +18,8 @@ import CompanyDashboard from './components/CompanyDashboard';
 import FirmSetup from './components/FirmSetup';
 import FirmSettings from './components/FirmSettings';
 import OrgBreakdownView from './components/OrgBreakdownView';
+import FundView from './components/FundView';
+import FundsListView from './components/FundsListView';
 
 function App() {
   const { isAuthenticated, user, firm, logout, needsDuoVerification } = useAuth();
@@ -29,6 +32,8 @@ function App() {
   }>({ accepted: [], rejected: [] });
   const [currentView, setCurrentView] = useState<ViewMode>('swipe');
   const [currentCompany, setCurrentCompany] = useState<Company | null>(null);
+  const [currentFund, setCurrentFund] = useState<Fund | null>(null);
+  const [funds] = useState<Fund[]>(mockFunds);
   const [icView, setIcView] = useState(false); // Investment Committee View toggle
 
   const handleSwipe = (direction: 'left' | 'right') => {
@@ -215,6 +220,52 @@ function App() {
     );
   }
 
+  if (currentView === 'funds') {
+    return (
+      <ProtectedRoute>
+        <div className="min-h-screen flex flex-col items-center justify-center p-4">
+          <FundsListView 
+            funds={funds}
+            companies={companies}
+            onBack={handleBackToSwipe}
+            onViewFund={(fund) => {
+              setCurrentFund(fund);
+              setCurrentView('fund-detail');
+            }}
+          />
+        </div>
+      </ProtectedRoute>
+    );
+  }
+
+  if (currentView === 'fund-detail' && currentFund) {
+    return (
+      <ProtectedRoute>
+        <div className="min-h-screen flex flex-col items-center justify-center p-4">
+          <FundView
+            fund={currentFund}
+            companies={companies}
+            onBack={() => setCurrentView('funds')}
+            onViewCompany={(company) => {
+              setCurrentCompany(company);
+              setCurrentView('swipe');
+            }}
+          />
+        </div>
+      </ProtectedRoute>
+    );
+  }
+
+  if (currentView === 'org-breakdown') {
+    return (
+      <ProtectedRoute>
+        <div className="min-h-screen flex flex-col items-center justify-center p-4">
+          <OrgBreakdownView onBack={handleBackToSwipe} />
+        </div>
+      </ProtectedRoute>
+    );
+  }
+
   return (
     <ProtectedRoute>
       <div className="min-h-screen flex flex-col items-center justify-center p-4">
@@ -252,6 +303,14 @@ function App() {
                   {icView ? 'IC View' : 'Standard View'}
                 </button>
               )}
+              
+              {/* Funds */}
+              <button
+                onClick={() => setCurrentView('funds')}
+                className="px-3 py-1.5 bg-slate-900 text-white border border-slate-900 rounded-institutional text-xs font-medium hover:bg-slate-800 transition-colors"
+              >
+                Funds
+              </button>
               
               {/* Org Breakdown */}
               <button
@@ -313,68 +372,71 @@ function App() {
         </div>
       )}
 
-      {/* Card Stack or IC View List */}
-      {icView ? (
-        <div className="w-full max-w-4xl mb-8">
-          <div className="mb-4">
-            <h3 className="text-sm font-semibold text-slate-700 mb-2 uppercase tracking-wide">
-              Investment Committee Review
-            </h3>
-            <p className="text-xs text-slate-500">
-              Executive summary view: vendor, run-rate, risk flags, recommended action
-            </p>
+      {/* Card Stack or IC View List - Only show in swipe view */}
+      {currentView === 'swipe' && (
+        icView ? (
+          <div className="w-full max-w-4xl mb-8">
+            <div className="mb-4">
+              <h3 className="text-sm font-semibold text-slate-700 mb-2 uppercase tracking-wide">
+                Investment Committee Review
+              </h3>
+              <p className="text-xs text-slate-500">
+                Executive summary view: vendor, run-rate, risk flags, recommended action
+              </p>
+            </div>
+            <div className="space-y-0">
+              {companies.map((company) => (
+                <div key={company.id} className="mb-0">
+                  <CompanyCard
+                    company={company}
+                    onViewConsultants={() => handleViewConsultants(company)}
+                    onViewSaaS={() => handleViewSaaS(company)}
+                    onViewLegal={() => handleViewLegal(company)}
+                    onViewContracts={() => handleViewContracts(company)}
+                    icView={true}
+                  />
+                </div>
+              ))}
+            </div>
           </div>
-          <div className="space-y-0">
-            {companies.map((company) => (
-              <div key={company.id} className="mb-0">
-                <CompanyCard
+        ) : (
+          <div className="relative w-full max-w-md h-[600px] flex items-center justify-center mb-8">
+            {companies.length > 0 ? (
+              companies.map((company, index) => (
+                <SwipeableCard
+                  key={company.id}
                   company={company}
+                  onSwipe={handleSwipe}
+                  index={index}
+                  totalCards={companies.length}
                   onViewConsultants={() => handleViewConsultants(company)}
                   onViewSaaS={() => handleViewSaaS(company)}
                   onViewLegal={() => handleViewLegal(company)}
                   onViewContracts={() => handleViewContracts(company)}
-                  icView={true}
                 />
+              ))
+            ) : (
+              <div className="text-center p-8 bg-white rounded-2xl shadow-xl">
+                <h2 className="text-2xl font-bold text-gray-800 mb-4">
+                  All done! 🎉
+                </h2>
+                <p className="text-gray-600 mb-6">
+                  You've reviewed all companies.
+                </p>
+                <button
+                  onClick={handleReset}
+                  className="bg-blue-600 text-white px-6 py-3 rounded-full font-semibold hover:bg-blue-700 transition-colors"
+                >
+                  Start Over
+                </button>
               </div>
-            ))}
+            )}
           </div>
-        </div>
-      ) : (
-        <div className="relative w-full max-w-md h-[600px] flex items-center justify-center mb-8">
-          {companies.length > 0 ? (
-            companies.map((company, index) => (
-              <SwipeableCard
-                key={company.id}
-                company={company}
-                onSwipe={handleSwipe}
-                index={index}
-                totalCards={companies.length}
-                onViewConsultants={() => handleViewConsultants(company)}
-                onViewSaaS={() => handleViewSaaS(company)}
-                onViewLegal={() => handleViewLegal(company)}
-                onViewContracts={() => handleViewContracts(company)}
-              />
-            ))
-          ) : (
-          <div className="text-center p-8 bg-white rounded-2xl shadow-xl">
-            <h2 className="text-2xl font-bold text-gray-800 mb-4">
-              All done! 🎉
-            </h2>
-            <p className="text-gray-600 mb-6">
-              You've reviewed all companies.
-            </p>
-            <button
-              onClick={handleReset}
-              className="bg-blue-600 text-white px-6 py-3 rounded-full font-semibold hover:bg-blue-700 transition-colors"
-            >
-              Start Over
-            </button>
-          </div>
-        )}
-      </div>
+        )
+      )}
 
-      {/* Action Buttons */}
-      {companies.length > 0 && (
+      {/* Action Buttons - Only show in swipe view, not IC view */}
+      {currentView === 'swipe' && !icView && companies.length > 0 && (
         <div className="flex gap-6">
           <button
             onClick={() => handleButtonClick('left')}
@@ -393,8 +455,8 @@ function App() {
         </div>
       )}
 
-      {/* Instructions */}
-      {companies.length > 0 && (
+      {/* Instructions - Only show in swipe view, not IC view */}
+      {currentView === 'swipe' && !icView && companies.length > 0 && (
         <p className="mt-8 text-sm text-gray-500 text-center max-w-md">
           Swipe left to reject, right to accept. Or use the buttons below.
         </p>
